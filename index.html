@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Bulk API Key Checker — Gemini / OpenAI</title>
+  <link rel="stylesheet" href="/assets/css/styles.css">
+  <meta name="description" content="Cek status API key massal untuk Gemini (Google Generative) atau OpenAI. Download hasil aktif/invalid sebagai .txt">
+</head>
+<body>
+  <header class="topbar">
+    <div class="container">
+      <h1>Bulk API Key Checker</h1>
+      <p class="lead">Periksa banyak API key sekaligus. Unduh daftar key aktif dan invalid sebagai .txt</p>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="panel">
+      <label class="field">Provider
+        <select id="provider">
+          <option value="gemini">Gemini / Google Generative</option>
+          <option value="openai">OpenAI</option>
+        </select>
+      </label>
+
+      <div class="columns">
+        <div class="col">
+          <label class="field">Upload file `.txt` (satu key per baris)
+            <input id="fileInput" type="file" accept=".txt" />
+          </label>
+
+          <label class="field">Atau paste di sini (satu per baris)
+            <textarea id="pasteArea" placeholder="Masukkan API keys di sini..."></textarea>
+          </label>
+
+          <label class="field small">Batch size (permintaan bersamaan)
+            <input id="batchSize" type="number" min="1" max="50" value="8">
+          </label>
+
+          <div class="actions">
+            <button id="startBtn" class="btn primary">Mulai Cek</button>
+            <button id="clearBtn" class="btn">Bersihkan</button>
+          </div>
+        </div>
+
+        <div class="col">
+          <div class="status">
+            <div id="progress">Menunggu tindakan...</div>
+            <div id="counts">Aktif: 0 — Invalid: 0 — Total: 0</div>
+          </div>
+
+          <div class="results">
+            <table id="resultsTable">
+              <thead><tr><th>#</th><th>Key (masked)</th><th>Status</th><th>Kode</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+
+          <div class="downloads">
+            <button id="downloadActive" class="btn" disabled>Download aktif (.txt)</button>
+            <button id="downloadInvalid" class="btn" disabled>Download invalid (.txt)</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <div class="container">Siap dipakai dengan Vercel (static + serverless function).</div>
+  </footer>
+
+  <script src="/assets/js/app.js"></script>
+</body>
+</html>

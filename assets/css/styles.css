@@ -1,0 +1,140 @@
+:root {
+  --bg: #f6f8fb;
+  --card: #ffffff;
+  --accent: #0b5cff;
+  --muted: #6b7280;
+  --success: #0ea5a4;
+  --danger: #ef4444;
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  font-family:
+    Inter,
+    Segoe UI,
+    Roboto,
+    Arial,
+    sans-serif;
+  margin: 0;
+  background: var(--bg);
+  color: #0f172a;
+}
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 24px;
+}
+.topbar {
+  background: linear-gradient(90deg, #0b5cff22, #8b5cff11);
+  border-bottom: 1px solid #e6eefb;
+}
+.topbar .container {
+  padding: 28px 24px;
+}
+h1 {
+  margin: 0;
+  font-size: 1.4rem;
+}
+.lead {
+  margin: 6px 0 0;
+  color: var(--muted);
+}
+.panel {
+  background: var(--card);
+  padding: 20px;
+  border-radius: 10px;
+  margin-top: 20px;
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.06);
+}
+.columns {
+  display: flex;
+  gap: 20px;
+}
+.col {
+  flex: 1;
+}
+.field {
+  display: block;
+  margin-bottom: 12px;
+}
+.field select,
+.field input[type="number"],
+.field input[type="file"],
+.field textarea {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #e6eefb;
+  border-radius: 8px;
+  background: #fff;
+}
+.field textarea {
+  height: 150px;
+  resize: vertical;
+}
+.actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 8px;
+}
+.btn {
+  padding: 10px 14px;
+  border-radius: 8px;
+  border: 1px solid #dbeafe;
+  background: #fff;
+  cursor: pointer;
+}
+.btn.primary {
+  background: var(--accent);
+  color: #fff;
+  border-color: transparent;
+}
+.status {
+  margin-bottom: 12px;
+}
+#progress {
+  font-weight: 600;
+}
+#counts {
+  color: var(--muted);
+  margin-top: 6px;
+}
+.results {
+  max-height: 420px;
+  overflow: auto;
+  border-top: 1px solid #f1f5f9;
+  padding-top: 10px;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+th,
+td {
+  padding: 8px 10px;
+  text-align: left;
+  border-bottom: 1px solid #f1f5f9;
+}
+.downloads {
+  display: flex;
+  gap: 10px;
+  margin-top: 12px;
+}
+.foot {
+  padding: 16px;
+  color: var(--muted);
+  text-align: center;
+  margin-top: 18px;
+}
+.masked {
+  font-family: monospace;
+  color: #111827;
+}
+.status-ok {
+  color: var(--success);
+  font-weight: 600;
+}
+.status-bad {
+  color: var(--danger);
+  font-weight: 600;
+}
