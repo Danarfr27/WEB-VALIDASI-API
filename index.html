@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>API Key Validator — Landing</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="container">
+      <h1 class="brand">API Key Validator</h1>
+      <nav class="nav">
+        <a href="#how">Cara Pakai</a>
+        <a href="#validate">Cek API</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="hero container">
+    <section class="hero-left">
+      <h2>Periksa Status API Key Anda</h2>
+      <p class="lead">Masukkan API key (atau beberapa key, satu per baris). Sistem akan mencoba memverifikasi secara cepat apakah key valid.</p>
+      <div class="card" id="validate">
+        <label for="provider">Provider</label>
+        <select id="provider">
+          <option value="gemini">Google Gemini (default)</option>
+          <option value="openai">OpenAI</option>
+        </select>
+
+        <label for="apikeys">API Key(s)</label>
+        <textarea id="apikeys" rows="6" placeholder="Masukkan API key, satu per baris..."></textarea>
+
+        <div class="actions">
+          <button id="validateBtn" class="btn btn-primary">Cek Sekarang</button>
+          <button id="clearBtn" class="btn btn-ghost">Bersihkan</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="hero-right">
+      <div class="card results" id="results">
+        <h3>Hasil</h3>
+        <div id="resultsList" class="results-list">Belum ada pengecekan.</div>
+        <div style="display:flex;gap:8px;margin-top:12px">
+          <button id="downloadValid" class="btn btn-primary" disabled>Download Valid (.txt)</button>
+          <button id="downloadInvalid" class="btn btn-ghost" disabled>Download Invalid (.txt)</button>
+        </div>
+      </div>
+      <div class="card info">
+        <h4 id="how">Cara Pakai</h4>
+        <ol>
+          <li>Masukkan satu atau lebih API key (satu per baris).</li>
+          <li>Pilih provider lalu klik <strong>Cek Sekarang</strong>.</li>
+          <li>Lihat hasil valid/invalid dan detail singkat.</li>
+        </ol>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">© 2026 API Key Validator — Siap di-deploy ke Vercel</div>
+  </footer>
+
+  <script src="/script.js"></script>
+</body>
+</html>
