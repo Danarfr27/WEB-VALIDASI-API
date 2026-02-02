@@ -6,14 +6,22 @@
   <title>FE4RD0WN API Key Checker — Gemini / OpenAI</title>
   <!-- Improved typography -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/assets/css/styles.css">
   <meta name="description" content="Cek status API key massal untuk Gemini (Google Generative) atau OpenAI. Download hasil aktif/invalid sebagai .txt">
 </head>
 <body>
   <header class="topbar">
     <div class="container">
-      <h1>Bulk API Key Checker</h1>
-      <p class="lead">APIKEY CHECKER STATUS BY FE4RD0WN!!</p>
+      <h1 class="sr-only">Bulk API Key Checker</h1>
+      <div class="marquee-wrap" aria-hidden="false">
+        <div class="marquee">
+          <span>[MASS APIKEYS CHECKER — Gemini &amp; OPENAI</span>
+          <span>API Key Checker — Gemini / OpenAI</span>
+        </div>
+      </div>
+      <p class="lead"></p>
     </div>
   </header>
 
@@ -42,7 +50,7 @@
 
           <div class="actions">
             <button id="startBtn" class="btn primary">Mulai Cek</button>
-            <button id="clearBtn" class="btn">Bersihkan</button>
+            <button id="clearBtn" class="btn primary">Bersihkan</button>
           </div>
         </div>
 
@@ -60,8 +68,8 @@
           </div>
 
           <div class="downloads">
-            <button id="downloadActive" class="btn" disabled>Download aktif (.txt)</button>
-            <button id="downloadInvalid" class="btn" disabled>Download invalid (.txt)</button>
+            <button id="downloadActive" class="btn primary" disabled>Download aktif (.txt)</button>
+            <button id="downloadInvalid" class="btn primary" disabled>Download invalid (.txt)</button>
           </div>
         </div>
       </div>
@@ -74,6 +82,7 @@ Designed by Dancode</div>
   </footer>
 
   <script src="/assets/js/theme-toggle.js"></script>
+  <script src="/assets/js/visuals.js"></script>
   <script src="/assets/js/app.js"></script>
 </body>
 </html>
