@@ -1,7 +1,6 @@
 // /api/validate.js — Vercel serverless function
 const https = require('https');
 
-// Provider configurations
 const PROVIDERS = {
   gemini: {
     endpoint: 'generativelanguage.googleapis.com',
@@ -9,7 +8,6 @@ const PROVIDERS = {
     authMode: 'query_key',
     keyName: null,
     extraHeaders: {},
-    port: 443,
   },
   openai: {
     endpoint: 'api.openai.com',
@@ -17,7 +15,6 @@ const PROVIDERS = {
     authMode: 'bearer',
     keyName: null,
     extraHeaders: {},
-    port: 443,
   },
   anthropic: {
     endpoint: 'api.anthropic.com',
@@ -25,7 +22,6 @@ const PROVIDERS = {
     authMode: 'api_key_header',
     keyName: 'x-api-key',
     extraHeaders: { 'anthropic-version': '2023-06-01' },
-    port: 443,
   },
   deepseek: {
     endpoint: 'api.deepseek.com',
@@ -33,7 +29,6 @@ const PROVIDERS = {
     authMode: 'bearer',
     keyName: null,
     extraHeaders: {},
-    port: 443,
   },
   openrouter: {
     endpoint: 'openrouter.ai',
@@ -41,12 +36,12 @@ const PROVIDERS = {
     authMode: 'bearer',
     keyName: null,
     extraHeaders: {},
-    port: 443,
   },
 };
 
 function detectProvider(key) {
-  if (!key || !key.startsWith('sk-')) return 'gemini';
+  if (!key || typeof key !== 'string') return 'gemini';
+  if (!key.startsWith('sk-')) return 'gemini';
   if (key.startsWith('sk-ant')) return 'anthropic';
   if (key.startsWith('sk-proj')) return 'openai';
   if (key.startsWith('sk-or')) return 'openrouter';
@@ -69,7 +64,7 @@ function makeRequest(config, key) {
 
     const options = {
       hostname: config.endpoint,
-      port: config.port,
+      port: 443,
       path: path,
       method: 'GET',
       headers: headers,
@@ -89,9 +84,9 @@ function makeRequest(config, key) {
           if (config.endpoint === 'api.deepseek.com') {
             try {
               const json = JSON.parse(data);
-              const bal = json.balance_infos?.[0]?.total_balance || 'N/A';
+              const bal = json.balance_infos && json.balance_infos[0] ? json.balance_infos[0].total_balance : 'N/A';
               statusText = `Active | Balance: ${bal}`;
-            } catch {
+            } catch (e) {
               statusText = 'Active';
             }
           } else if (config.endpoint === 'openrouter.ai') {
@@ -100,7 +95,7 @@ function makeRequest(config, key) {
               const usage = json.usage || 0;
               const limit = json.limit || 'unlimited';
               statusText = `Active | Usage: ${usage}/${limit}`;
-            } catch {
+            } catch (e) {
               statusText = 'Active';
             }
           } else {
@@ -130,7 +125,7 @@ function makeRequest(config, key) {
 }
 
 module.exports = async (req, res) => {
-  // Enable CORS
+  // CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -152,7 +147,7 @@ module.exports = async (req, res) => {
     const provider = body.provider || 'auto';
 
     if (!Array.isArray(keys) || keys.length === 0) {
-      res.status(400).json({ ok: false, error: 'No keys provided' });
+      res.status(400).json({ ok: false, error: 'No keys provided', body: body });
       return;
     }
 
@@ -162,7 +157,7 @@ module.exports = async (req, res) => {
       const config = PROVIDERS[detectedProvider] || PROVIDERS.gemini;
       const result = await makeRequest(config, key);
       results.push({
-        key,
+        key: key,
         valid: result.valid,
         status: result.status,
         httpCode: result.httpCode,
@@ -170,7 +165,7 @@ module.exports = async (req, res) => {
       });
     }
 
-    res.status(200).json({ ok: true, results });
+    res.status(200).json({ ok: true, results: results });
   } catch (err) {
     console.error('Server error:', err);
     res.status(500).json({ ok: false, error: err.message });
