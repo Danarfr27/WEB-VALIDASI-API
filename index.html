@@ -1,277 +1,1132 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FE4RD0WN API Key Checker</title>
-<style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    font-family: 'Segoe UI', system-ui, sans-serif;
-    background: #0f0f23;
-    color: #e0e0e0;
-    min-height: 100vh;
-    padding: 20px;
-  }
-  .container { max-width: 900px; margin: 0 auto; }
-  h1 {
-    text-align: center;
-    color: #00ff88;
-    font-size: 1.8rem;
-    margin-bottom: 8px;
-    text-shadow: 0 0 10px rgba(0,255,136,0.3);
-  }
-  .subtitle {
-    text-align: center;
-    color: #888;
-    font-size: 0.9rem;
-    margin-bottom: 24px;
-  }
-  .card {
-    background: #1a1a2e;
-    border: 1px solid #2a2a4e;
-    border-radius: 12px;
-    padding: 20px;
-    margin-bottom: 16px;
-  }
-  .card h3 {
-    color: #00d4ff;
-    font-size: 1rem;
-    margin-bottom: 12px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-  .card h3::before {
-    content: '';
-    display: inline-block;
-    width: 4px;
-    height: 16px;
-    background: #00d4ff;
-    border-radius: 2px;
-  }
-  input[type="file"], textarea, select, input[type="number"] {
-    width: 100%;
-    background: #0f0f23;
-    border: 1px solid #2a2a4e;
-    border-radius: 8px;
-    padding: 12px;
-    color: #e0e0e0;
-    font-size: 0.9rem;
-    transition: border-color 0.2s;
-  }
-  input[type="file"]:hover, textarea:hover, select:hover, input[type="number"]:hover {
-    border-color: #00d4ff;
-  }
-  textarea {
-    min-height: 120px;
-    resize: vertical;
-    font-family: 'Consolas', monospace;
-    font-size: 0.85rem;
-  }
-  select {
-    cursor: pointer;
-  }
-  .row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-  }
-  .btn-group {
-    display: flex;
-    gap: 10px;
-    margin-top: 16px;
-  }
-  button {
-    flex: 1;
-    padding: 12px 20px;
-    border: none;
-    border-radius: 8px;
-    font-size: 0.95rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s;
-  }
-  #startBtn {
-    background: linear-gradient(135deg, #00ff88, #00cc6a);
-    color: #0f0f23;
-  }
-  #startBtn:hover:not(:disabled) {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 15px rgba(0,255,136,0.4);
-  }
-  #startBtn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-  #clearBtn {
-    background: #2a2a4e;
-    color: #e0e0e0;
-  }
-  #clearBtn:hover {
-    background: #3a3a5e;
-  }
-  .progress {
-    text-align: center;
-    padding: 16px;
-    color: #00d4ff;
-    font-size: 0.95rem;
-    font-weight: 500;
-  }
-  .counts {
-    text-align: center;
-    padding: 8px;
-    color: #888;
-    font-size: 0.85rem;
-    margin-bottom: 12px;
-  }
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 0.85rem;
-  }
-  th {
-    background: #0f0f23;
-    color: #00d4ff;
-    padding: 10px 8px;
-    text-align: left;
-    font-weight: 600;
-    border-bottom: 2px solid #2a2a4e;
-  }
-  td {
-    padding: 10px 8px;
-    border-bottom: 1px solid #1a1a2e;
-  }
-  tr:hover td {
-    background: #1a1a2e;
-  }
-  .masked {
-    font-family: 'Consolas', monospace;
-    color: #ffaa00;
-    font-size: 0.8rem;
-  }
-  .status-ok {
-    color: #00ff88;
-    font-weight: 600;
-  }
-  .status-bad {
-    color: #ff4444;
-    font-weight: 600;
-  }
-  .provider-tag {
-    font-size: 0.75rem;
-    padding: 2px 8px;
-    border-radius: 4px;
-    background: #2a2a4e;
-    color: #00d4ff;
-    display: inline-block;
-  }
-  .download-group {
-    display: flex;
-    gap: 10px;
-    margin-top: 12px;
-  }
-  .download-group button {
-    background: #2a2a4e;
-    color: #e0e0e0;
-    font-size: 0.85rem;
-    padding: 10px;
-  }
-  .download-group button:hover:not(:disabled) {
-    background: #3a3a5e;
-  }
-  .download-group button:disabled {
-    opacity: 0.3;
-    cursor: not-allowed;
-  }
-  .info-box {
-    background: #1a1a2e;
-    border-left: 3px solid #00d4ff;
-    padding: 12px 16px;
-    margin-bottom: 16px;
-    border-radius: 0 8px 8px 0;
-    font-size: 0.85rem;
-    color: #aaa;
-  }
-  .info-box strong { color: #00d4ff; }
-  @media (max-width: 600px) {
-    .row { grid-template-columns: 1fr; }
-    h1 { font-size: 1.4rem; }
-  }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Key Checker - Cek Status API Key</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0f0f23;
+            color: #e0e0e0;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px 0;
+        }
+
+        .header h1 {
+            font-size: 2.2rem;
+            color: #00d4ff;
+            margin-bottom: 8px;
+            text-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
+        }
+
+        .header p {
+            color: #8892b0;
+            font-size: 0.95rem;
+        }
+
+        .card {
+            background: #1a1a2e;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 20px;
+            border: 1px solid #2a2a4a;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .card-title {
+            font-size: 1.1rem;
+            color: #00d4ff;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-title i {
+            font-size: 1rem;
+        }
+
+        .upload-area {
+            border: 2px dashed #3a3a5a;
+            border-radius: 10px;
+            padding: 40px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: #13132a;
+        }
+
+        .upload-area:hover {
+            border-color: #00d4ff;
+            background: #1a1a3a;
+        }
+
+        .upload-area i {
+            font-size: 2.5rem;
+            color: #00d4ff;
+            margin-bottom: 12px;
+        }
+
+        .upload-area p {
+            color: #8892b0;
+            font-size: 0.9rem;
+        }
+
+        .upload-area .file-types {
+            font-size: 0.75rem;
+            color: #555;
+            margin-top: 8px;
+        }
+
+        .or-divider {
+            text-align: center;
+            margin: 16px 0;
+            color: #555;
+            font-size: 0.85rem;
+            position: relative;
+        }
+
+        .or-divider::before,
+        .or-divider::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            width: 40%;
+            height: 1px;
+            background: #2a2a4a;
+        }
+
+        .or-divider::before { left: 0; }
+        .or-divider::after { right: 0; }
+
+        textarea {
+            width: 100%;
+            min-height: 120px;
+            background: #13132a;
+            border: 1px solid #2a2a4a;
+            border-radius: 8px;
+            padding: 12px;
+            color: #e0e0e0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+            resize: vertical;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        textarea:focus {
+            border-color: #00d4ff;
+        }
+
+        textarea::placeholder {
+            color: #555;
+        }
+
+        .settings-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        @media (max-width: 600px) {
+            .settings-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .form-group label {
+            font-size: 0.85rem;
+            color: #8892b0;
+        }
+
+        select, input[type="number"] {
+            background: #13132a;
+            border: 1px solid #2a2a4a;
+            border-radius: 8px;
+            padding: 10px 12px;
+            color: #e0e0e0;
+            font-size: 0.9rem;
+            outline: none;
+            cursor: pointer;
+            transition: border-color 0.3s;
+        }
+
+        select:focus, input[type="number"]:focus {
+            border-color: #00d4ff;
+        }
+
+        select option {
+            background: #1a1a2e;
+            color: #e0e0e0;
+        }
+
+        .provider-icon {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .provider-auto { background: #00d4ff; }
+        .provider-gemini { background: #4285f4; }
+        .provider-openai { background: #10a37f; }
+        .provider-claude { background: #cc785c; }
+        .provider-deepseek { background: #4d6bfa; }
+        .provider-openrouter { background: #ff6b35; }
+
+        .btn-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-start {
+            background: #00d4ff;
+            color: #0f0f23;
+        }
+
+        .btn-start:hover:not(:disabled) {
+            background: #00b8e6;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(0, 212, 255, 0.3);
+        }
+
+        .btn-start:disabled {
+            background: #1a3a4a;
+            color: #555;
+            cursor: not-allowed;
+        }
+
+        .btn-clear {
+            background: #2a2a4a;
+            color: #e0e0e0;
+        }
+
+        .btn-clear:hover {
+            background: #3a3a5a;
+        }
+
+        .btn-download {
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-download-active {
+            background: #10a37f;
+            color: white;
+        }
+
+        .btn-download-active:hover {
+            background: #0d8a6a;
+        }
+
+        .btn-download-invalid {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .btn-download-invalid:hover {
+            background: #c0392b;
+        }
+
+        .btn-download:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .status-bar {
+            text-align: center;
+            padding: 20px;
+            background: #13132a;
+            border-radius: 8px;
+            margin-bottom: 16px;
+        }
+
+        .status-text {
+            font-size: 1rem;
+            color: #00d4ff;
+            margin-bottom: 8px;
+        }
+
+        .status-text.scanning {
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .status-counts {
+            font-size: 0.85rem;
+            color: #8892b0;
+        }
+
+        .status-counts .count-active {
+            color: #10a37f;
+            font-weight: 600;
+        }
+
+        .status-counts .count-invalid {
+            color: #e74c3c;
+            font-weight: 600;
+        }
+
+        .status-counts .count-total {
+            color: #00d4ff;
+            font-weight: 600;
+        }
+
+        .results-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 16px;
+        }
+
+        .results-table th {
+            background: #13132a;
+            color: #00d4ff;
+            padding: 12px;
+            text-align: left;
+            font-size: 0.85rem;
+            font-weight: 600;
+            border-bottom: 1px solid #2a2a4a;
+        }
+
+        .results-table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #1a1a3a;
+            font-size: 0.85rem;
+        }
+
+        .results-table tr:hover {
+            background: #13132a;
+        }
+
+        .results-table .key-cell {
+            font-family: 'Courier New', monospace;
+            max-width: 200px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .status-active {
+            background: rgba(16, 163, 127, 0.2);
+            color: #10a37f;
+        }
+
+        .status-invalid {
+            background: rgba(231, 76, 60, 0.2);
+            color: #e74c3c;
+        }
+
+        .status-pending {
+            background: rgba(0, 212, 255, 0.2);
+            color: #00d4ff;
+        }
+
+        .detail-cell {
+            color: #8892b0;
+            font-size: 0.8rem;
+        }
+
+        .download-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: #13132a;
+            border-radius: 3px;
+            margin-top: 12px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #00d4ff;
+            border-radius: 3px;
+            transition: width 0.3s ease;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .provider-select-wrapper {
+            position: relative;
+        }
+
+        .provider-select-wrapper select {
+            width: 100%;
+            appearance: none;
+            padding-right: 30px;
+        }
+
+        .provider-select-wrapper::after {
+            content: '\f107';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #8892b0;
+            pointer-events: none;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #555;
+        }
+
+        .empty-state i {
+            font-size: 2rem;
+            margin-bottom: 12px;
+            color: #2a2a4a;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #1a1a2e;
+            border: 1px solid #2a2a4a;
+            border-radius: 8px;
+            padding: 12px 20px;
+            color: #e0e0e0;
+            font-size: 0.85rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .toast.success {
+            border-color: #10a37f;
+        }
+
+        .toast.error {
+            border-color: #e74c3c;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid #00d4ff;
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .file-info {
+            background: #13132a;
+            border-radius: 8px;
+            padding: 10px 14px;
+            margin-top: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.85rem;
+        }
+
+        .file-info i {
+            color: #00d4ff;
+        }
+
+        .file-info .remove-file {
+            margin-left: auto;
+            color: #e74c3c;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .file-info .remove-file:hover {
+            color: #c0392b;
+        }
+    </style>
 <base target="_blank">
 </head>
 <body>
-<div class="container">
-  <h1>🔑 FE4RD0WN API Key Checker</h1>
-  <p class="subtitle">Support: Gemini | OpenAI | Anthropic (Claude) | DeepSeek | OpenRouter</p>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-key"></i> API Key Checker</h1>
+            <p>Cek status API Key aktif atau invalid untuk berbagai provider AI</p>
+        </div>
 
-  <div class="info-box">
-    <strong>Auto-detect:</strong> Pilih "Auto" untuk deteksi otomatis provider dari prefix key.
-    <br>Format: <code>sk-ant-...</code> = Claude, <code>sk-or-...</code> = OpenRouter, <code>sk-...</code> (pendek) = DeepSeek
-  </div>
+        <!-- Input Section -->
+        <div class="card">
+            <div class="card-title">
+                <i class="fas fa-upload"></i> Upload File
+            </div>
+            <div class="upload-area" id="uploadArea">
+                <i class="fas fa-cloud-upload-alt"></i>
+                <p>Klik atau drag file .txt di sini</p>
+                <div class="file-types">Format: .txt (satu key per baris)</div>
+            </div>
+            <input type="file" id="fileInput" accept=".txt" style="display: none;">
+            <div id="fileInfo" class="file-info hidden">
+                <i class="fas fa-file-alt"></i>
+                <span id="fileName"></span>
+                <span id="fileKeys"></span>
+                <i class="fas fa-times remove-file" id="removeFile"></i>
+            </div>
 
-  <div class="card">
-    <h3>Upload File</h3>
-    <input type="file" id="fileInput" accept=".txt">
-  </div>
+            <div class="or-divider">ATAU</div>
 
-  <div class="card">
-    <h3>Atau Paste Disini</h3>
-    <textarea id="pasteArea" placeholder="Paste API keys (satu per baris)...
-# Baris diawali # akan diabaikan"></textarea>
-  </div>
+            <div class="card-title">
+                <i class="fas fa-paste"></i> Paste Disini
+            </div>
+            <textarea id="apiKeysInput" placeholder="Paste API key di sini, satu key per baris...&#10;&#10;Contoh:&#10;sk-xxxxxxxxxxxxxxxxxxxxxxxx&#10;sk-ant-api03-xxxxxxxxxxxxxxxx&#10;AIzaSyxxxxxxxxxxxxxxxx"></textarea>
+        </div>
 
-  <div class="card">
-    <h3>Pengaturan</h3>
-    <div class="row">
-      <div>
-        <label style="display:block; margin-bottom:6px; font-size:0.85rem; color:#888;">Provider</label>
-        <select id="provider">
-          <option value="auto" selected>🤖 Auto Detect</option>
-          <option value="gemini">🔷 Gemini</option>
-          <option value="openai">🟢 OpenAI</option>
-          <option value="anthropic">🟣 Anthropic (Claude)</option>
-          <option value="deepseek">🔶 DeepSeek</option>
-          <option value="openrouter">🔵 OpenRouter</option>
-        </select>
-      </div>
-      <div>
-        <label style="display:block; margin-bottom:6px; font-size:0.85rem; color:#888;">Batch Size</label>
-        <input type="number" id="batchSize" value="8" min="1" max="50">
-      </div>
+        <!-- Settings Section -->
+        <div class="card">
+            <div class="card-title">
+                <i class="fas fa-cog"></i> Pengaturan
+            </div>
+            <div class="settings-row">
+                <div class="form-group">
+                    <label>Provider</label>
+                    <div class="provider-select-wrapper">
+                        <select id="providerSelect">
+                            <option value="auto">🤖 Auto Detect</option>
+                            <option value="gemini">🔹 Gemini</option>
+                            <option value="openai">🟢 OpenAI</option>
+                            <option value="claude">🟣 Anthropic (Claude)</option>
+                            <option value="deepseek">🔶 DeepSeek</option>
+                            <option value="openrouter">🔵 OpenRouter</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Batch Size</label>
+                    <input type="number" id="batchSize" value="5" min="1" max="20">
+                </div>
+            </div>
+            <div class="btn-group">
+                <button class="btn btn-start" id="startBtn">
+                    <i class="fas fa-rocket"></i> Mulai Cek
+                </button>
+                <button class="btn btn-clear" id="clearBtn">
+                    <i class="fas fa-trash-alt"></i> Bersihkan
+                </button>
+            </div>
+            <div class="progress-bar hidden" id="progressBar">
+                <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+            </div>
+        </div>
+
+        <!-- Results Section -->
+        <div class="card">
+            <div class="card-title">
+                <i class="fas fa-chart-bar"></i> Hasil
+            </div>
+            <div class="status-bar">
+                <div class="status-text" id="statusText">Menunggu tindakan...</div>
+                <div class="status-counts">
+                    <span class="count-active">Aktif: <span id="countActive">0</span></span> — 
+                    <span class="count-invalid">Invalid: <span id="countInvalid">0</span></span> — 
+                    <span class="count-total">Total: <span id="countTotal">0</span></span>
+                </div>
+            </div>
+
+            <div id="resultsContainer">
+                <div class="empty-state">
+                    <i class="fas fa-clipboard-list"></i>
+                    <p>Hasil pengecekan akan muncul di sini</p>
+                </div>
+            </div>
+
+            <div class="download-buttons" id="downloadButtons">
+                <button class="btn-download btn-download-active" id="downloadActive" disabled>
+                    <i class="fas fa-download"></i> Download Aktif (<span id="downloadActiveCount">0</span>)
+                </button>
+                <button class="btn-download btn-download-invalid" id="downloadInvalid" disabled>
+                    <i class="fas fa-download"></i> Download Invalid (<span id="downloadInvalidCount">0</span>)
+                </button>
+            </div>
+        </div>
     </div>
-    <div class="btn-group">
-      <button id="startBtn">🚀 Mulai Cek</button>
-      <button id="clearBtn">🗑️ Bersihkan</button>
-    </div>
-  </div>
 
-  <div class="card">
-    <h3>Hasil</h3>
-    <div class="progress" id="progress">Menunggu tindakan...</div>
-    <div class="counts" id="counts">Aktif: 0 — Invalid: 0 — Total: 0</div>
-    <div style="overflow-x:auto;">
-      <table id="resultsTable">
-        <thead>
-          <tr>
-            <th style="width:40px;">#</th>
-            <th style="width:140px;">Key</th>
-            <th style="width:90px;">Provider</th>
-            <th style="width:70px;">Status</th>
-            <th>Detail</th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
-    </div>
-    <div class="download-group">
-      <button id="downloadActive" disabled>📥 Download Aktif</button>
-      <button id="downloadInvalid" disabled>📥 Download Invalid</button>
-    </div>
-  </div>
-</div>
+    <div class="toast" id="toast"></div>
 
-<script src="app.js"></script>
+    <script>
+        // DOM Elements
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const fileInfo = document.getElementById('fileInfo');
+        const fileName = document.getElementById('fileName');
+        const fileKeys = document.getElementById('fileKeys');
+        const removeFile = document.getElementById('removeFile');
+        const apiKeysInput = document.getElementById('apiKeysInput');
+        const providerSelect = document.getElementById('providerSelect');
+        const batchSize = document.getElementById('batchSize');
+        const startBtn = document.getElementById('startBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const progressBar = document.getElementById('progressBar');
+        const progressFill = document.getElementById('progressFill');
+        const statusText = document.getElementById('statusText');
+        const countActive = document.getElementById('countActive');
+        const countInvalid = document.getElementById('countInvalid');
+        const countTotal = document.getElementById('countTotal');
+        const resultsContainer = document.getElementById('resultsContainer');
+        const downloadActive = document.getElementById('downloadActive');
+        const downloadInvalid = document.getElementById('downloadInvalid');
+        const downloadActiveCount = document.getElementById('downloadActiveCount');
+        const downloadInvalidCount = document.getElementById('downloadInvalidCount');
+        const toast = document.getElementById('toast');
+
+        let uploadedKeys = [];
+        let results = [];
+        let isScanning = false;
+        let activeKeys = [];
+        let invalidKeys = [];
+
+        // Provider detection patterns
+        const providerPatterns = {
+            openai: { prefix: /^sk-[a-zA-Z0-9]{20,}/, name: 'OpenAI' },
+            claude: { prefix: /^sk-ant-api03-[a-zA-Z0-9]{20,}/, name: 'Anthropic' },
+            openrouter: { prefix: /^sk-or-[a-zA-Z0-9]{20,}/, name: 'OpenRouter' },
+            deepseek: { prefix: /^sk-[a-zA-Z0-9]{20,}/, name: 'DeepSeek' },
+            gemini: { prefix: /^AIza[a-zA-Z0-9_-]{35,}/, name: 'Gemini' }
+        };
+
+        function detectProvider(key) {
+            if (key.startsWith('sk-ant-api03-')) return 'claude';
+            if (key.startsWith('sk-or-')) return 'openrouter';
+            if (key.startsWith('AIza')) return 'gemini';
+            if (key.startsWith('sk-')) return 'openai'; // Default to OpenAI for sk- prefix
+            return 'unknown';
+        }
+
+        function getProviderName(provider) {
+            const names = {
+                openai: 'OpenAI',
+                claude: 'Anthropic',
+                openrouter: 'OpenRouter',
+                deepseek: 'DeepSeek',
+                gemini: 'Gemini',
+                unknown: 'Unknown'
+            };
+            return names[provider] || 'Unknown';
+        }
+
+        function getProviderColor(provider) {
+            const colors = {
+                openai: '#10a37f',
+                claude: '#cc785c',
+                openrouter: '#ff6b35',
+                deepseek: '#4d6bfa',
+                gemini: '#4285f4',
+                unknown: '#888'
+            };
+            return colors[provider] || '#888';
+        }
+
+        // File upload handling
+        uploadArea.addEventListener('click', () => fileInput.click());
+
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.style.borderColor = '#00d4ff';
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.style.borderColor = '#3a3a5a';
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.style.borderColor = '#3a3a5a';
+            const files = e.dataTransfer.files;
+            if (files.length > 0) handleFile(files[0]);
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) handleFile(e.target.files[0]);
+        });
+
+        removeFile.addEventListener('click', () => {
+            uploadedKeys = [];
+            fileInfo.classList.add('hidden');
+            fileInput.value = '';
+        });
+
+        function handleFile(file) {
+            if (!file.name.endsWith('.txt')) {
+                showToast('Hanya file .txt yang diperbolehkan', 'error');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const content = e.target.result;
+                uploadedKeys = content.split('\n').map(k => k.trim()).filter(k => k.length > 0);
+
+                fileName.textContent = file.name;
+                fileKeys.textContent = `(${uploadedKeys.length} keys)`;
+                fileInfo.classList.remove('hidden');
+
+                showToast(`${uploadedKeys.length} API key terdeteksi dari file`, 'success');
+            };
+            reader.readAsText(file);
+        }
+
+        // Clear button
+        clearBtn.addEventListener('click', () => {
+            apiKeysInput.value = '';
+            uploadedKeys = [];
+            fileInfo.classList.add('hidden');
+            fileInput.value = '';
+            results = [];
+            activeKeys = [];
+            invalidKeys = [];
+            updateResultsTable();
+            updateCounts();
+            statusText.textContent = 'Menunggu tindakan...';
+            statusText.classList.remove('scanning');
+            progressBar.classList.add('hidden');
+            progressFill.style.width = '0%';
+            downloadActive.disabled = true;
+            downloadInvalid.disabled = true;
+            showToast('Semua data telah dibersihkan', 'success');
+        });
+
+        // Start checking
+        startBtn.addEventListener('click', async () => {
+            if (isScanning) return;
+
+            // Get all keys
+            let keys = [];
+
+            if (uploadedKeys.length > 0) {
+                keys = [...uploadedKeys];
+            }
+
+            const pastedKeys = apiKeysInput.value.split('\n').map(k => k.trim()).filter(k => k.length > 0);
+            if (pastedKeys.length > 0) {
+                keys = [...keys, ...pastedKeys];
+            }
+
+            if (keys.length === 0) {
+                showToast('Masukkan API key terlebih dahulu', 'error');
+                return;
+            }
+
+            // Remove duplicates
+            keys = [...new Set(keys)];
+
+            isScanning = true;
+            startBtn.disabled = true;
+            startBtn.innerHTML = '<span class="spinner"></span> Memeriksa...';
+            statusText.textContent = 'Sedang memeriksa API key...';
+            statusText.classList.add('scanning');
+            progressBar.classList.remove('hidden');
+
+            results = [];
+            activeKeys = [];
+            invalidKeys = [];
+            updateCounts();
+            updateResultsTable();
+
+            const selectedProvider = providerSelect.value;
+            const batch = parseInt(batchSize.value) || 5;
+            const total = keys.length;
+
+            for (let i = 0; i < keys.length; i++) {
+                const key = keys[i];
+                const progress = ((i + 1) / total) * 100;
+                progressFill.style.width = `${progress}%`;
+                statusText.textContent = `Memeriksa ${i + 1} dari ${total}...`;
+
+                let provider = selectedProvider;
+                if (provider === 'auto') {
+                    provider = detectProvider(key);
+                }
+
+                const result = await checkApiKey(key, provider);
+                results.push(result);
+
+                if (result.status === 'active') {
+                    activeKeys.push(key);
+                } else {
+                    invalidKeys.push(key);
+                }
+
+                updateCounts();
+                updateResultsTable();
+
+                // Delay between requests to avoid rate limiting
+                if (i < keys.length - 1) {
+                    await delay(1000 / batch);
+                }
+            }
+
+            isScanning = false;
+            startBtn.disabled = false;
+            startBtn.innerHTML = '<i class="fas fa-rocket"></i> Mulai Cek';
+            statusText.textContent = 'Pemeriksaan selesai!';
+            statusText.classList.remove('scanning');
+            progressBar.classList.add('hidden');
+            progressFill.style.width = '0%';
+
+            downloadActive.disabled = activeKeys.length === 0;
+            downloadInvalid.disabled = invalidKeys.length === 0;
+            downloadActiveCount.textContent = activeKeys.length;
+            downloadInvalidCount.textContent = invalidKeys.length;
+
+            showToast(`Selesai! ${activeKeys.length} aktif, ${invalidKeys.length} invalid`, 'success');
+        });
+
+        async function checkApiKey(key, provider) {
+            try {
+                let isValid = false;
+                let detail = '';
+
+                switch (provider) {
+                    case 'openai':
+                        const openaiResult = await checkOpenAI(key);
+                        isValid = openaiResult.valid;
+                        detail = openaiResult.detail;
+                        break;
+                    case 'claude':
+                        const claudeResult = await checkClaude(key);
+                        isValid = claudeResult.valid;
+                        detail = claudeResult.detail;
+                        break;
+                    case 'gemini':
+                        const geminiResult = await checkGemini(key);
+                        isValid = geminiResult.valid;
+                        detail = geminiResult.detail;
+                        break;
+                    case 'deepseek':
+                        const deepseekResult = await checkDeepSeek(key);
+                        isValid = deepseekResult.valid;
+                        detail = deepseekResult.detail;
+                        break;
+                    case 'openrouter':
+                        const openrouterResult = await checkOpenRouter(key);
+                        isValid = openrouterResult.valid;
+                        detail = openrouterResult.detail;
+                        break;
+                    default:
+                        detail = 'Provider tidak dikenali';
+                }
+
+                return {
+                    key: key,
+                    provider: getProviderName(provider),
+                    providerCode: provider,
+                    status: isValid ? 'active' : 'invalid',
+                    detail: detail
+                };
+            } catch (error) {
+                return {
+                    key: key,
+                    provider: getProviderName(provider),
+                    providerCode: provider,
+                    status: 'invalid',
+                    detail: `Error: ${error.message}`
+                };
+            }
+        }
+
+        async function checkOpenAI(key) {
+            try {
+                const response = await fetch('https://api.openai.com/v1/models', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${key}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.status === 200) {
+                    return { valid: true, detail: 'Key valid - Models list retrieved' };
+                } else if (response.status === 401) {
+                    return { valid: false, detail: 'Invalid API key (401)' };
+                } else if (response.status === 429) {
+                    return { valid: true, detail: 'Key valid - Rate limited (429)' };
+                } else {
+                    const data = await response.json().catch(() => ({}));
+                    return { valid: false, detail: data.error?.message || `HTTP ${response.status}` };
+                }
+            } catch (error) {
+                return { valid: false, detail: `Network error: ${error.message}` };
+            }
+        }
+
+        async function checkClaude(key) {
+            try {
+                const response = await fetch('https://api.anthropic.com/v1/models', {
+                    method: 'GET',
+                    headers: {
+                        'x-api-key': key,
+                        'anthropic-version': '2023-06-01',
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.status === 200) {
+                    return { valid: true, detail: 'Key valid - Models list retrieved' };
+                } else if (response.status === 401) {
+                    return { valid: false, detail: 'Invalid API key (401)' };
+                } else {
+                    const data = await response.json().catch(() => ({}));
+                    return { valid: false, detail: data.error?.message || `HTTP ${response.status}` };
+                }
+            } catch (error) {
+                return { valid: false, detail: `Network error: ${error.message}` };
+            }
+        }
+
+        async function checkGemini(key) {
+            try {
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${key}`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.status === 200) {
+                    return { valid: true, detail: 'Key valid - Models list retrieved' };
+                } else if (response.status === 400) {
+                    const data = await response.json().catch(() => ({}));
+                    if (data.error?.message?.includes('API key not valid')) {
+                        return { valid: false, detail: 'Invalid API key (400)' };
+                    }
+                    return { valid: false, detail: data.error?.message || 'Invalid API key' };
+                } else if (response.status === 403) {
+                    return { valid: false, detail: 'Invalid API key (403)' };
+                } else {
+                    const data = await response.json().catch(() => ({}));
+                    return { valid: false, detail: data.error?.message || `HTTP ${response.status}` };
+                }
+            } catch (error) {
+                return { valid: false, detail: `Network error: ${error.message}` };
+            }
+        }
+
+        async function checkDeepSeek(key) {
+            try {
+                const response = await fetch('https://api.deepseek.com/v1/models', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${key}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.status === 200) {
+                    return { valid: true, detail: 'Key valid - Models list retrieved' };
+                } else if (response.status === 401) {
+                    return { valid: false, detail: 'Invalid API key (401)' };
+                } else if (response.status === 402) {
+                    return { valid: true, detail: 'Key valid - Payment required (402)' };
+                } else {
+                    const data = await response.json().catch(() => ({}));
+                    return { valid: false, detail: data.error?.message || `HTTP ${response.status}` };
+                }
+            } catch (error) {
+                return { valid: false, detail: `Network error: ${error.message}` };
+            }
+        }
+
+        async function checkOpenRouter(key) {
+            try {
+                const response = await fetch('https://openrouter.ai/api/v1/models', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${key}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.status === 200) {
+                    return { valid: true, detail: 'Key valid - Models list retrieved' };
+                } else if (response.status === 401) {
+                    return { valid: false, detail: 'Invalid API key (401)' };
+                } else if (response.status === 402) {
+                    return { valid: true, detail: 'Key valid - Credits needed (402)' };
+                } else {
+                    const data = await response.json().catch(() => ({}));
+                    return { valid: false, detail: data.error?.message || `HTTP ${response.status}` };
+                }
+            } catch (error) {
+                return { valid: false, detail: `Network error: ${error.message}` };
+            }
+        }
+
+        function delay(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        function updateCounts() {
+            countActive.textContent = activeKeys.length;
+            countInvalid.textContent = invalidKeys.length;
+            countTotal.textContent = results.length;
+        }
+
+        function updateResultsTable() {
+            if (results.length === 0) {
+                resultsContainer.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-clipboard-list"></i>
+                        <p>Hasil pengecekan akan muncul di sini</p>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = `
+                <table class="results-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 40px;">#</th>
+                            <th>Key</th>
+                            <th style="width: 120px;">Provider</th>
+                            <th style="width: 90px;">Status</th>
+                            <th>Detail</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            results.forEach((result, index) => {
+                const statusClass = result.status === 'active' ? 'status-active' : 'status-invalid';
+                const statusText = result.status === 'active' ? 'Aktif' : 'Invalid';
+                const providerColor = getProviderColor(result.providerCode);
+
+                html += `
+                    <tr>
+                        <td>${index + 1}</td>
+                        <td class="key-cell" title="${result.key}">${result.key}</td>
+                        <td>
+                            <span style="color: ${providerColor}; font-weight: 600;">
+                                <span class="provider-icon" style="background: ${providerColor};"></span>
+                                ${result.provider}
+                            </span>
+                        </td>
+                        <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+                        <td class="detail-cell">${result.detail}</td>
+                    </tr>
+                `;
+            });
+
+            html += '</tbody></table>';
+            resultsContainer.innerHTML = html;
+        }
+
+        // Download buttons
+        downloadActive.addEventListener('click', () => {
+            if (activeKeys.length === 0) return;
+            const content = activeKeys.join('\n');
+            downloadFile(content, 'aktif.txt', 'text/plain');
+            showToast(`${activeKeys.length} key aktif telah diunduh`, 'success');
+        });
+
+        downloadInvalid.addEventListener('click', () => {
+            if (invalidKeys.length === 0) return;
+            const content = invalidKeys.join('\n');
+            downloadFile(content, 'invalid.txt', 'text/plain');
+            showToast(`${invalidKeys.length} key invalid telah diunduh`, 'success');
+        });
+
+        function downloadFile(content, filename, mimeType) {
+            const blob = new Blob([content], { type: mimeType });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        function showToast(message, type = 'success') {
+            toast.textContent = message;
+            toast.className = `toast ${type} show`;
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+    </script>
 </body>
 </html>
