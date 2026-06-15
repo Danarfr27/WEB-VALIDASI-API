@@ -46,7 +46,7 @@ const PROVIDERS = {
 };
 
 function detectProvider(key) {
-  if (!key.startsWith('sk-')) return 'gemini';
+  if (!key || !key.startsWith('sk-')) return 'gemini';
   if (key.startsWith('sk-ant')) return 'anthropic';
   if (key.startsWith('sk-proj')) return 'openai';
   if (key.startsWith('sk-or')) return 'openrouter';
@@ -86,7 +86,6 @@ function makeRequest(config, key) {
 
         if (status === 200) {
           valid = true;
-          // Provider-specific parsing
           if (config.endpoint === 'api.deepseek.com') {
             try {
               const json = JSON.parse(data);
@@ -147,7 +146,11 @@ module.exports = async (req, res) => {
   }
 
   try {
-    const { keys, provider } = req.body;
+    // Vercel auto-parses JSON body when Content-Type is application/json
+    const body = req.body || {};
+    const keys = body.keys;
+    const provider = body.provider || 'auto';
+
     if (!Array.isArray(keys) || keys.length === 0) {
       res.status(400).json({ ok: false, error: 'No keys provided' });
       return;
@@ -169,6 +172,7 @@ module.exports = async (req, res) => {
 
     res.status(200).json({ ok: true, results });
   } catch (err) {
+    console.error('Server error:', err);
     res.status(500).json({ ok: false, error: err.message });
   }
 };
