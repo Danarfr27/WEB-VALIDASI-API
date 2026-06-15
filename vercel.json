@@ -1,6 +1,5 @@
 {
   "rewrites": [
-    { "source": "/api/validate", "destination": "/api/validate.js" },
-    { "source": "/api/sendActiveEmail", "destination": "/api/sendActiveEmail.js" }
+    { "source": "/api/validate", "destination": "/api/validate.js" }
   ]
 }
