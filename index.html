@@ -18,11 +18,42 @@
             color: #e0e0e0;
             min-height: 100vh;
             padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Parallax Background Elements */
+        .parallax-bg {
+            position: fixed;
+            top: -20%;
+            left: -20%;
+            width: 140%;
+            height: 140%;
+            z-index: -1;
+            pointer-events: none;
+            will-change: transform;
+        }
+
+        .bg-grid {
+            background-image: linear-gradient(rgba(0, 212, 255, 0.02) 1px, transparent 1px),
+                              linear-gradient(90deg, rgba(0, 212, 255, 0.02) 1px, transparent 1px);
+            background-size: 40px 40px;
+            opacity: 0.7;
+        }
+
+        .bg-orb-1 {
+            background: radial-gradient(circle at 15% 25%, rgba(0, 212, 255, 0.08) 0%, transparent 40%);
+        }
+
+        .bg-orb-2 {
+            background: radial-gradient(circle at 85% 75%, rgba(66, 133, 244, 0.08) 0%, transparent 45%);
         }
 
         .container {
             max-width: 900px;
             margin: 0 auto;
+            position: relative;
+            z-index: 1;
         }
 
         .header {
@@ -44,7 +75,9 @@
         }
 
         .card {
-            background: #1a1a2e;
+            background: rgba(26, 26, 46, 0.9);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
             border-radius: 12px;
             padding: 24px;
             margin-bottom: 20px;
@@ -148,12 +181,6 @@
             margin-bottom: 16px;
         }
 
-        @media (max-width: 600px) {
-            .settings-row {
-                grid-template-columns: 1fr;
-            }
-        }
-
         .form-group {
             display: flex;
             flex-direction: column;
@@ -166,6 +193,7 @@
         }
 
         select, input[type="number"] {
+            width: 100%;
             background: #13132a;
             border: 1px solid #2a2a4a;
             border-radius: 8px;
@@ -256,6 +284,7 @@
             border: none;
             display: flex;
             align-items: center;
+            justify-content: center;
             gap: 6px;
             transition: all 0.3s ease;
         }
@@ -309,6 +338,10 @@
         .status-counts {
             font-size: 0.85rem;
             color: #8892b0;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 8px;
         }
 
         .status-counts .count-active {
@@ -326,10 +359,20 @@
             font-weight: 600;
         }
 
+        /* Responsive Table Wrap */
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            border-radius: 8px;
+            border: 1px solid #2a2a4a;
+            margin-top: 16px;
+        }
+
         .results-table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 16px;
+            min-width: 600px; /* Menjamin kolom tidak gepeng di mobile */
         }
 
         .results-table th {
@@ -518,10 +561,59 @@
         .file-info .remove-file:hover {
             color: #c0392b;
         }
+
+        /* Responsive Media Queries untuk Smartphone/Mobile Web */
+        @media (max-width: 768px) {
+            body {
+                padding: 12px;
+            }
+
+            .header h1 {
+                font-size: 1.8rem;
+            }
+
+            .card {
+                padding: 16px;
+                margin-bottom: 16px;
+            }
+
+            .upload-area {
+                padding: 30px 15px;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .settings-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .btn-group, .download-buttons {
+                grid-template-columns: 1fr;
+                gap: 8px;
+            }
+
+            .header h1 {
+                font-size: 1.5rem;
+            }
+
+            .toast {
+                left: 12px;
+                right: 12px;
+                bottom: 12px;
+                text-align: center;
+            }
+        }
     </style>
 <base target="_blank">
 </head>
 <body>
+    <!-- Parallax Layers -->
+    <div class="parallax-bg bg-grid" id="bgGrid"></div>
+    <div class="parallax-bg bg-orb-1" id="bgOrb1"></div>
+    <div class="parallax-bg bg-orb-2" id="bgOrb2"></div>
+
     <div class="container">
         <div class="header">
             <h1><i class="fas fa-key"></i> API Key Checker</h1>
@@ -599,8 +691,8 @@
             <div class="status-bar">
                 <div class="status-text" id="statusText">Menunggu tindakan...</div>
                 <div class="status-counts">
-                    <span class="count-active">Aktif: <span id="countActive">0</span></span> — 
-                    <span class="count-invalid">Invalid: <span id="countInvalid">0</span></span> — 
+                    <span class="count-active">Aktif: <span id="countActive">0</span></span>
+                    <span class="count-invalid">Invalid: <span id="countInvalid">0</span></span>
                     <span class="count-total">Total: <span id="countTotal">0</span></span>
                 </div>
             </div>
@@ -651,11 +743,24 @@
         const downloadInvalidCount = document.getElementById('downloadInvalidCount');
         const toast = document.getElementById('toast');
 
+        // Background elements for Parallax
+        const bgGrid = document.getElementById('bgGrid');
+        const bgOrb1 = document.getElementById('bgOrb1');
+        const bgOrb2 = document.getElementById('bgOrb2');
+
         let uploadedKeys = [];
         let results = [];
         let isScanning = false;
         let activeKeys = [];
         let invalidKeys = [];
+
+        // JavaScript Parallax Effect on Scroll
+        window.addEventListener('scroll', () => {
+            const scrolled = window.pageYOffset;
+            bgGrid.style.transform = `translateY(${scrolled * 0.15}px)`;
+            bgOrb1.style.transform = `translateY(${scrolled * 0.25}px) scale(${1 + scrolled * 0.0002})`;
+            bgOrb2.style.transform = `translateY(${scrolled * -0.1}px)`;
+        });
 
         // Provider detection patterns
         const providerPatterns = {
@@ -670,7 +775,7 @@
             if (key.startsWith('sk-ant-api03-')) return 'claude';
             if (key.startsWith('sk-or-')) return 'openrouter';
             if (key.startsWith('AIza')) return 'gemini';
-            if (key.startsWith('sk-')) return 'openai'; // Default to OpenAI for sk- prefix
+            if (key.startsWith('sk-')) return 'openai'; 
             return 'unknown';
         }
 
@@ -771,7 +876,6 @@
         startBtn.addEventListener('click', async () => {
             if (isScanning) return;
 
-            // Get all keys
             let keys = [];
 
             if (uploadedKeys.length > 0) {
@@ -788,7 +892,6 @@
                 return;
             }
 
-            // Remove duplicates
             keys = [...new Set(keys)];
 
             isScanning = true;
@@ -831,7 +934,6 @@
                 updateCounts();
                 updateResultsTable();
 
-                // Delay between requests to avoid rate limiting
                 if (i < keys.length - 1) {
                     await delay(1000 / batch);
                 }
@@ -1055,17 +1157,18 @@
             }
 
             let html = `
-                <table class="results-table">
-                    <thead>
-                        <tr>
-                            <th style="width: 40px;">#</th>
-                            <th>Key</th>
-                            <th style="width: 120px;">Provider</th>
-                            <th style="width: 90px;">Status</th>
-                            <th>Detail</th>
-                        </tr>
-                    </thead>
-                    <tbody>
+                <div class="table-responsive">
+                    <table class="results-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 40px;">#</th>
+                                <th>Key</th>
+                                <th style="width: 120px;">Provider</th>
+                                <th style="width: 90px;">Status</th>
+                                <th>Detail</th>
+                            </tr>
+                        </thead>
+                        <tbody>
             `;
 
             results.forEach((result, index) => {
@@ -1089,7 +1192,7 @@
                 `;
             });
 
-            html += '</tbody></table>';
+            html += '</tbody></table></div>';
             resultsContainer.innerHTML = html;
         }
 
